@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+    var path = "http://10.10.10.90:8080/jsonEx/quiz";
+    $.getJSON(path, function (data) {
+        console.log(data);
+    })
+</script>
+
+</body>
+</html>

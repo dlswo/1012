@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<style>
+    * {
+        margin: 0px;
+        padding: 0px;
+    }
+    .sample {
+        position: absolute;
+        top: 100px;
+        left: 100px;
+    }
+    .wrapper {
+        width: 100%;
+        height: 100vh;
+        background-color: chocolate;
+    }
+</style>
+
+<div class="wrapper">
+    <img class="sample" src="http://localhost:8080/jsonEx/imgs/1_000.jpg">
+</div>
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+
+    var count = 0;
+
+    // setInterval(function () { //100초 간격으로 계속 실행
+    //     console.log("........." + count++);
+    // }, 100)
+
+    var startX, endX;
+    var direction;
+    var currentPage = 0;
+
+    var host = "http://localhost:8080";
+
+    var sample = $(".sample");
+
+    $(".sample").on("touchstart mousedown", function (e) {
+        e.preventDefault();
+        startX = e.pageX;
+    })
+
+    $(".sample").on("touchend mouseup", function (e) {
+        e.preventDefault();
+        endX = e.pageX;
+
+        var gap = startX - endX;
+
+        direction = gap > 0 ? "f" : "p";
+
+        console.log(direction);
+
+        $.getJSON("http://localhost:8080/jsonEx/webtoon",
+            {page:currentPage, dir:direction},
+            function(data){
+                console.log(data);
+                if(direction === 'f'){
+                    currentPage++;
+                }else{
+                    currentPage--;
+                }
+
+                sample.attr("src",host + data.dest);
+
+            });
+    })
+
+    // $('.wrapper').on("mousemove", function (e) {
+    //
+    //     var xPos = e.pageX - 80 + "px";
+    //     var yPos = e.pageY - 80 + "px";
+    //
+    //     console.log(xPos, yPos);
+    //
+    //     $(".sample").animate({left: xPos, top: yPos}, 0, function () {
+    //        console.log("move end.....")
+    //     });
+    //     console.log(e);
+    // })
+
+</script>
+
+</body>
+</html>

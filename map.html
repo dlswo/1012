@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>지도 생성하기</title>
+
+</head>
+<body>
+<!-- 지도를 표시할 div 입니다 -->
+<div id="map" style="width:100%;height:50vh;"></div>
+
+<style>
+    .wrapper{
+        display: flex;
+        width: 100%;
+        height: 50vh;
+        justify-content: center;
+        align-items: center;
+        background-color: skyblue;
+    }
+    .listUL{
+        list-style: none;
+        color: white;
+        font-size: 2em;
+    }
+    .listUL li{
+        border: 1px solid white;
+    }
+</style>
+
+<div >
+    <button id="korBtn" class="btn" data-type="k">한식</button>
+    <button id="japBtn" class="btn" data-type="j">일식</button>
+    <button id="wesBtn" class="btn" data-type="w">양식</button>
+</div>
+<div class="wrapper">
+    <ul class="listUL">
+    </ul>
+</div>
+
+<script src="store.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=4bd54a12e70b615cf1c7e6066275d6f6"></script>
+<script>
+    getLocation();
+    function getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.watchPosition(showPosition);
+        }
+    }
+
+    function showPosition(position) {
+        var mapContainer = document.getElementById('map'), // 지도를 표시할 div
+            mapOption = {
+                center: new daum.maps.LatLng(position.coords.latitude, position.coords.longitude), // 지도의 중심좌표
+                level: 3 // 지도의 확대 레벨
+            };
+        var map = new daum.maps.Map(mapContainer, mapOption);
+        userMarker = new daum.maps.Marker({
+            position: new daum.maps.LatLng(position.coords.latitude, position.coords.longitude),
+            map: map
+        });
+        daum.maps.event.addListener(map, 'dragend', function() {
+            // 지도 중심좌표를 얻어옵니다
+            var latlng = map.getCenter();
+
+            console.log(latlng);
+
+            var nnstore = dao.findNNStore({lat:latlng.jb, lng:latlng.ib});
+
+
+            console.log(nnstore);
+
+        });
+    }
+
+
+
+
+    // daum.maps.event.addListener(map, 'dragend', function() {
+    //
+    //     // 지도 중심좌표를 얻어옵니다
+    //     var latlng = map.getCenter();
+    //
+    //     console.log(latlng);
+    //
+    //     var nnstore = dao.findNNStore({lat:latlng.jb, lng:latlng.ib});
+    //
+    //     console.log(nnstore);
+    //
+    // });
+
+</script>
+
+<script>
+    var arr = [];
+    var lat = 38.569340;
+    var lng = 126.983665;
+    var kind = [];
+
+        function mycallback(data){
+            arr=data;
+            console.log(arr);
+            var str = '';
+
+            for (var store of arr){
+
+                var storeStr = JSON.stringify(store);
+
+                str += "<li onclick='show("+storeStr+")'>" + store.name + "</li>";
+
+            }
+            targetUL.innerHTML = str;
+        }
+
+    var targetUL = document.querySelector(".listUL");
+
+    var kindArr = [];
+
+    function addOrRemove(value){
+
+        var idx = -1;
+
+        for(var i = 0; i < kindArr.length; i++){
+
+            if(kindArr[i] === value){
+                idx = i;
+            }
+        }
+
+
+        console.log("======================");
+        console.log(idx);
+
+        if(idx >= 0){
+            kindArr.splice(idx,1);
+            return;
+        }
+
+        kindArr.push(value);
+
+    }
+
+
+    $('.btn').on("click",function(e) {
+
+        var obj = e.originalEvent.target;
+        var kind = $(obj).attr("data-type");
+
+        console.log(kind);
+
+        addOrRemove(kind);
+
+        console.log(kindArr);
+
+        $.getJSON(
+            {
+                url: "http://localhost:8080/store",
+                dataType: "jsonp",
+                data: {kind: kindArr, lat: lat, lng: lng},
+                jsonpCallback: "mycallback"
+            }
+        )
+
+    });
+
+
+
+
+
+
+</script>
+
+</body>
+</html>
